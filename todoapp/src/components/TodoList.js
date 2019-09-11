@@ -1,52 +1,50 @@
-import React, { Component } from "react";
-import dummyData from "./dummydata";
+import React, { useState, useReducer } from "react";
+import { reducer, initalState } from "../reducers/reducers";
 import TodoItem from "./TodoItem";
-class TodoList extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      items: []
-    };
+import "./TodoList.css";
 
-    this.addItem = this.addItem.bind(this);
-  }
-  addItem(e) {
-    if (this._inputElement.value !== "") {
-      var newItem = {
-        text: this._inputElement.value,
-        key: Date.now()
-      };
+const TodoList = () => {
+  const [todos, setTodos] = useState("");
 
-      this.setState(prevState => {
-        return {
-          items: prevState.items.concat(newItem)
-        };
-      });
+  const [state, dispatch] = useReducer(reducer, initalState);
 
-      this._inputElement.value = "";
-    }
+  const changeHandler = e => {
+    setTodos(e.target.value);
+  };
 
-    console.log(this.state.items);
-
+  const addItem = e => {
     e.preventDefault();
-  }
+    const newItem = {
+      text: todos,
+      id: Date.now(),
+      completed: false
+    };
+    const action = {
+      type: "ADD_ITEM",
+      payload: newItem
+    };
+    dispatch(action);
 
-  render() {
-    return (
-      <div className="todoListMain">
-        <div className="header">
-          <form onSubmit={this.addItem}>
-            <input placeholder="enter task"></input>
-            <button type="submit">add</button>
-          </form>
-          <div className="tasks">
-            {dummyData.map(item => (
-              <TodoItem data={item} />
-            ))}
-          </div>
+    console.log(state.items);
+  };
+
+  return (
+    <div className="todoListMain">
+      <div className="header">
+        <form onSubmit={addItem}>
+          <input
+            onChange={changeHandler}
+            value={todos}
+            placeholder="enter task"
+          ></input>
+          <button type="submit">add</button>
+        </form>
+        <div className="tasks">
+          <TodoItem entries={state.items} />
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
+
 export default TodoList;
